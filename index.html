@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ♥</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0d0205;
+  font-family: 'Cormorant Garamond', serif;
+  color: #f5e6e8;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#particles {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+
+/* ══════════════════════
+   LOCK SCREEN
+══════════════════════ */
+#lock-screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 200;
+  background: radial-gradient(ellipse at center, #1e040a 0%, #0d0205 70%);
+  transition: opacity 1s ease;
+}
+#lock-screen.fade-out { opacity: 0; pointer-events: none; }
+
+.heart-lock-container {
+  position: relative;
+  width: 340px; height: 340px;
+  display: flex; align-items: center; justify-content: center;
+  animation: float 3.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-16px); }
+}
+
+.heart-lock-container.unlocking {
+  animation: heartZoom 1.5s cubic-bezier(0.25,0.46,0.45,0.94) forwards !important;
+}
+
+@keyframes heartZoom {
+  0%   { transform: scale(1)   translateY(0);    opacity: 1; }
+  25%  { transform: scale(1.2) translateY(-6px); opacity: 1; }
+  55%  { transform: scale(3)   translateY(-10px);opacity: 1; }
+  100% { transform: scale(50)  translateY(0);    opacity: 0; }
+}
+
+.heart-svg {
+  width: 340px; height: 340px;
+  filter: drop-shadow(0 0 30px rgba(180,30,60,0.8));
+  transition: filter 0.4s ease;
+}
+.heart-svg.glowing {
+  filter: drop-shadow(0 0 60px rgba(220,60,90,1))
+          drop-shadow(0 0 120px rgba(180,30,60,0.75));
+}
+
+.lock-icon {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  width: 86px; height: 86px;
+  transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.5s ease;
+}
+.lock-icon.open {
+  transform: translate(-50%, -105%) rotate(-22deg);
+  opacity: 0;
+}
+
+#password-form {
+  margin-top: 2.6rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.75rem;
+}
+
+.hint-text {
+  font-style: italic; font-size: 1.1rem;
+  color: #ff9aaa; letter-spacing: 0.1em;
+  text-shadow:
+    0 0 6px  rgba(255,100,130,1),
+    0 0 18px rgba(220,50, 80,0.95),
+    0 0 40px rgba(200,30, 60,0.85),
+    0 0 70px rgba(180,20, 50,0.6);
+}
+
+#pw-input {
+  background: transparent; border: none;
+  border-bottom: 1px solid #6b1d2e;
+  color: #f5e6e8;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; letter-spacing: 0.35em;
+  text-align: center; padding: 0.5rem 1.2rem;
+  outline: none; width: 230px;
+  transition: border-color 0.3s;
+}
+#pw-input:focus { border-bottom-color: #c0394f; }
+#pw-input::placeholder { color: #4a1828; letter-spacing: 0.1em; font-size: 0.9rem; }
+
+.error-msg {
+  font-size: 0.88rem; color: #8b3a4a;
+  font-style: italic; letter-spacing: 0.06em;
+  opacity: 0; transition: opacity 0.4s; min-height: 1.2rem;
+}
+.error-msg.show { opacity: 1; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+.shake { animation: shake 0.4s ease; }
+
+/* ══════════════════════
+   MAIN CONTENT
+══════════════════════ */
+#main-content {
+  display: none; flex-direction: column;
+  align-items: center;
+  position: relative; z-index: 1;
+  padding-bottom: 5rem;
+}
+#main-content.visible { display: flex; }
+
+/* ── Header area: roses + typed text, above corkboard ── */
+#message-header {
+  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem clamp(2rem, 5vw, 3.5rem);
+  position: relative;
+}
+
+/* soft red halo behind the text */
+#message-header::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(700px, 90vw); height: 260px;
+  background: radial-gradient(ellipse, rgba(165,22,48,0.28) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── 6-7 roses, fixed ── */
+.rose-row {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  opacity: 0;
+  animation: roseIn 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.2s forwards;
+  margin-bottom: 1.6rem;
+  letter-spacing: 0.25em;
+  line-height: 1;
+  text-align: center;
+  position: relative; z-index: 1;
+}
+
+@keyframes roseIn {
+  from { opacity: 0; transform: scale(0.4) rotate(-15deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* ── Glowing typed text ── */
+.typing-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.7rem);
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
+  max-width: min(700px, 90vw);
+  position: relative; z-index: 1;
+  text-shadow:
+    0 0 6px  rgba(255,220,225,1),
+    0 0 12px rgba(255,120,150,1),
+    0 0 28px rgba(220,55, 85,1),
+    0 0 55px rgba(200,30, 60,0.9),
+    0 0 100px rgba(160,10,40,0.7);
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px; height: 0.95em;
+  background: #ff6080;
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: blink 0.75s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ══════════════════════
+   MEMORIES / CORKBOARD
+══════════════════════ */
+#memories-section {
+  display: none;
+  width: 100%; max-width: 1020px;
+  padding: 0 clamp(0.6rem, 3vw, 2rem);
+  opacity: 0; transform: translateY(50px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+#memories-section.revealed { opacity: 1; transform: translateY(0); }
+
+.ornament {
+  text-align: center; color: #5a1828;
+  font-size: 1rem; margin: 0 0 2rem;
+  letter-spacing: 0.6em;
+}
+
+/* Corkboard */
+.corkboard {
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(100,45,20,0.07) 28px, rgba(100,45,20,0.07) 29px),
+    repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(100,45,20,0.05) 28px, rgba(100,45,20,0.05) 29px),
+    radial-gradient(ellipse at 25% 25%, #3d1a0f 0%, #2a1008 45%, #1e0b06 100%);
+  border-radius: 10px;
+  padding: clamp(1.4rem, 4vw, 3rem) clamp(0.8rem, 3vw, 2.5rem);
+  border: 2px solid #3a1608;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.5),
+    inset 0 0 20px rgba(0,0,0,0.3),
+    0 0 60px rgba(80,10,20,0.4);
+}
+
+/* 4-photo rows */
+.photos-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.6rem, 2vw, 1.4rem);
+  margin-bottom: clamp(1rem, 3vw, 1.8rem);
+}
+
+/* Video */
+.video-wrapper {
+  position: relative;
+  width: min(270px, 48%);
+  margin: 0 auto clamp(1rem, 3vw, 1.8rem);
+}
+.video-pin {
+  position: absolute; top: -13px; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 16px;
+  background: radial-gradient(circle at 35% 35%, #f0d070, #b08020);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.7), inset 0 -1px 2px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+.video-tape {
+  background: #130508;
+  border: 3px solid #4a1828; border-radius: 4px;
+  aspect-ratio: 9/16;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.9rem;
+  box-shadow: 5px 8px 25px rgba(0,0,0,0.75), 0 0 0 1px #280810;
+  transform: rotate(-1deg);
+  position: relative; overflow: hidden;
+}
+.video-tape::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom, transparent, transparent 3px,
+    rgba(180,60,80,0.04) 3px, rgba(180,60,80,0.04) 4px
+  );
+  pointer-events: none;
+}
+.play-btn {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 2px solid #6b2535;
+  display: flex; align-items: center; justify-content: center;
+  color: #8b3545; font-size: 1.3rem; cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+.play-btn:hover { border-color: #c0394f; color: #c0394f; }
+.video-label {
+  font-style: italic; font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+  color: #7a2535; letter-spacing: 0.1em;
+  text-align: center; padding: 0 1rem; line-height: 1.6;
+}
+.video-note {
+  position: absolute; bottom: 6px; right: 8px;
+  font-size: 0.6rem; color: #4a1828; font-family: monospace;
+}
+
+/* Photo items */
+.photo-item {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0.3s ease;
+}
+.photo-item:hover { transform: scale(1.06) rotate(0deg) !important; z-index: 20; }
+
+.pin {
+  width: 14px; height: 14px; border-radius: 50%;
+  position: absolute; top: -8px; left: 50%;
+  transform: translateX(-50%); z-index: 5;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.7), inset 0 -1px 2px rgba(0,0,0,0.3);
+}
+.pin.gold   { background: radial-gradient(circle at 35% 35%, #f0d070, #b08020); }
+.pin.red    { background: radial-gradient(circle at 35% 35%, #e85060, #8b1a2a); }
+.pin.silver { background: radial-gradient(circle at 35% 35%, #e0e0e0, #808080); }
+.pin.cream  { background: radial-gradient(circle at 35% 35%, #fff8e0, #c8b060); }
+
+.photo-frame {
+  background: #f2ece4;
+  padding: clamp(4px,1.2vw,8px) clamp(4px,1.2vw,8px) clamp(16px,4vw,26px);
+  box-shadow: 4px 6px 20px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.2);
+  width: 100%; aspect-ratio: 1;
+  display: flex; align-items: flex-start; justify-content: center;
+  cursor: pointer;
+}
+.photo-inner {
+  width: 100%; flex: 1;
+  background: linear-gradient(135deg, #2a1018, #3d1820 50%, #241018);
+  display: flex; align-items: center; justify-content: center;
+  font-style: italic;
+  font-size: clamp(0.58rem, 1.5vw, 0.75rem);
+  color: #5a2030; text-align: center;
+  padding: 0.4rem; line-height: 1.5;
+}
+
+.closing {
+  text-align: center; margin-top: 2.2rem;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  color: #ff9aaa; letter-spacing: 0.06em; line-height: 1.9;
+  text-shadow:
+    0 0 6px  rgba(255,100,130,1),
+    0 0 18px rgba(220,50, 80,0.95),
+    0 0 40px rgba(200,30, 60,0.85),
+    0 0 70px rgba(180,20, 50,0.6);
+}
+
+/* ══════════════════════
+   RESPONSIVE
+══════════════════════ */
+@media (max-width: 600px) {
+  .heart-lock-container { width: 260px; height: 260px; }
+  .heart-svg            { width: 260px; height: 260px; }
+  .lock-icon            { width: 66px;  height: 66px;  }
+  .photos-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 380px) {
+  .heart-lock-container { width: 210px; height: 210px; }
+  .heart-svg            { width: 210px; height: 210px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ══════════════════════════════
+     LOCK SCREEN
+══════════════════════════════ -->
+<div id="lock-screen">
+
+  <div class="heart-lock-container" id="heartContainer">
+    <svg class="heart-svg" id="heartSvg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="heartGrad" cx="50%" cy="38%" r="62%">
+          <stop offset="0%"   stop-color="#d44060"/>
+          <stop offset="55%"  stop-color="#9b1a2e"/>
+          <stop offset="100%" stop-color="#4e0a18"/>
+        </radialGradient>
+        <radialGradient id="heartGradGlow" cx="50%" cy="38%" r="62%">
+          <stop offset="0%"   stop-color="#ff6080"/>
+          <stop offset="50%"  stop-color="#c0304a"/>
+          <stop offset="100%" stop-color="#6e1228"/>
+        </radialGradient>
+        <filter id="softGlow" x="-25%" y="-25%" width="150%" height="150%">
+          <feGaussianBlur stdDeviation="7" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path
+        d="M130 218 C130 218 30 152 30 90 C30 55 54 34 82 34 C100 34 118 44 130 62 C142 44 160 34 178 34 C206 34 230 55 230 90 C230 152 130 218 130 218Z"
+        fill="#7a0f1e" filter="url(#softGlow)" opacity="0.55"
+        transform="translate(0,5) scale(1.04)" style="transform-origin:130px 130px;"
+      />
+      <path id="heartPath"
+        d="M130 218 C130 218 30 152 30 90 C30 55 54 34 82 34 C100 34 118 44 130 62 C142 44 160 34 178 34 C206 34 230 55 230 90 C230 152 130 218 130 218Z"
+        fill="url(#heartGrad)" stroke="#c0394f" stroke-width="1.5"
+      />
+      <ellipse cx="105" cy="82" rx="22" ry="13" fill="white" opacity="0.14" transform="rotate(-25,105,82)"/>
+      <ellipse cx="119" cy="67" rx="9"  ry="5"  fill="white" opacity="0.09" transform="rotate(-25,119,67)"/>
+    </svg>
+
+    <svg class="lock-icon" id="lockIcon" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+      <rect x="12" y="29" width="42" height="32" rx="5" fill="#f5e6e8" opacity="0.93"/>
+      <path d="M22 29 V20 C22 8 44 8 44 20 V29"
+        fill="none" stroke="#f5e6e8" stroke-width="4.5"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.93"/>
+      <circle cx="33" cy="43" r="4.5" fill="#8b1a2a"/>
+      <line x1="33" y1="47.5" x2="33" y2="54" stroke="#8b1a2a" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div id="password-form">
+    <div class="hint-text">Hint: Ted's tattoo</div>
+    <input type="password" id="pw-input" placeholder="enter the secret…" autocomplete="off" spellcheck="false"/>
+    <div class="error-msg" id="error-msg">that's not quite right, love…</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════
+     MAIN CONTENT
+     All on ONE page: roses → typed text → corkboard
+══════════════════════════════ -->
+<div id="main-content">
+
+  <!-- Header: roses + glowing typed message -->
+  <div id="message-header">
+    <div class="rose-row" id="rose-row">🌹 🌹 🌹 🌹 🌹 🌹 🌹</div>
+    <div class="typing-text" id="typing-text"></div>
+  </div>
+
+  <!-- Memories section — directly below, no separate page -->
+  <div id="memories-section">
+    <div class="ornament">— ♥ —</div>
+
+    <div class="corkboard">
+
+      <!-- TOP 4 PHOTOS -->
+      <div class="photos-row">
+        <div class="photo-item" style="transform:rotate(-3.5deg);">
+          <div class="pin gold"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi1.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(2.5deg);">
+          <div class="pin red"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi2.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(-1.8deg);">
+          <div class="pin silver"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi3.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(3.2deg);">
+          <div class="pin cream"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi4.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO centred -->
+      <div class="video-wrapper">
+        <div class="video-pin"></div>
+        <div class="video-tape">
+          <video src="./images/emimarsivid.mp4" controls
+              style="width:100%;height:100%;object-fit:cover;">
+            </video>
+        </div>
+      </div>
+
+      <!-- BOTTOM 4 PHOTOS -->
+      <div class="photos-row">
+        <div class="photo-item" style="transform:rotate(2.8deg);">
+          <div class="pin red"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi5.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(-2.2deg);">
+          <div class="pin gold"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi6.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(1.5deg);">
+          <div class="pin cream"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi7.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+        <div class="photo-item" style="transform:rotate(-3deg);">
+          <div class="pin silver"></div>
+          <div class="photo-frame">
+            <div class="photo-inner"><img src="./images/Foto emimarsi8.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="closing">
+        one month down,<br>a lifetime to go.
+      </div>
+
+    </div><!-- end corkboard -->
+  </div><!-- end memories-section -->
+
+</div><!-- end main-content -->
+
+<script>
+/* ─── PETALS ─── */
+const canvas = document.getElementById('particles');
+const ctx    = canvas.getContext('2d');
+let W, H, petals = [];
+
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const COLS = ['#8b1a2a','#c0394f','#6b0f1a','#d44060','#4e0818'];
+
+function Petal() { this.reset(true); }
+Petal.prototype.reset = function(init) {
+  this.x  = Math.random() * W;
+  this.y  = init ? Math.random() * H : -20;
+  this.sz = Math.random() * 5 + 2;
+  this.vy = Math.random() * 0.7 + 0.25;
+  this.vx = (Math.random() - 0.5) * 0.5;
+  this.op = Math.random() * 0.35 + 0.1;
+  this.wb = Math.random() * Math.PI * 2;
+  this.ws = Math.random() * 0.018 + 0.005;
+  this.c  = COLS[Math.floor(Math.random() * COLS.length)];
+  this.ag = Math.random() * Math.PI;
+};
+Petal.prototype.update = function() {
+  this.wb += this.ws;
+  this.x  += this.vx + Math.sin(this.wb) * 0.5;
+  this.y  += this.vy;
+  if (this.y > H + 20) this.reset(false);
+};
+Petal.prototype.draw = function() {
+  ctx.save();
+  ctx.globalAlpha = this.op;
+  ctx.fillStyle   = this.c;
+  ctx.beginPath();
+  ctx.ellipse(this.x, this.y, this.sz * 0.6, this.sz * 1.4, this.ag + this.wb, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+};
+
+for (let i = 0; i < 45; i++) petals.push(new Petal());
+(function loop() {
+  ctx.clearRect(0, 0, W, H);
+  petals.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(loop);
+})();
+
+/* ─── PASSWORD ─── */
+const input       = document.getElementById('pw-input');
+const lockScreen  = document.getElementById('lock-screen');
+const heartCont   = document.getElementById('heartContainer');
+const heartSvg    = document.getElementById('heartSvg');
+const lockIcon    = document.getElementById('lockIcon');
+const heartPath   = document.getElementById('heartPath');
+const errorMsg    = document.getElementById('error-msg');
+const mainContent = document.getElementById('main-content');
+const memSection  = document.getElementById('memories-section');
+
+input.addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+input.addEventListener('input',   () => errorMsg.classList.remove('show'));
+
+function checkPw() {
+  if (input.value.trim().toLowerCase() === 'butterfly') {
+    unlock();
+  } else {
+    errorMsg.classList.add('show');
+    input.value = '';
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 500);
+  }
+}
+
+function unlock() {
+  lockIcon.classList.add('open');
+
+  setTimeout(() => {
+    heartSvg.classList.add('glowing');
+    heartPath.setAttribute('fill', 'url(#heartGradGlow)');
+    let beat = 0;
+    const pulse = setInterval(() => {
+      heartCont.style.transform = beat % 2 === 0 ? 'scale(1.13)' : 'scale(1.0)';
+      if (++beat > 4) clearInterval(pulse);
+    }, 200);
+  }, 430);
+
+  setTimeout(() => {
+    heartCont.style.animation = 'none';
+    void heartCont.offsetWidth;
+    heartCont.classList.add('unlocking');
+  }, 1060);
+
+  setTimeout(() => lockScreen.classList.add('fade-out'), 1950);
+  setTimeout(() => {
+    lockScreen.style.display = 'none';
+    mainContent.classList.add('visible');
+    startTyping();
+  }, 2900);
+}
+
+/* ─── TYPING — then reveal corkboard on same page ─── */
+const MESSAGE = 'Thank you for being mine for one holy month';
+
+function startTyping() {
+  const el     = document.getElementById('typing-text');
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  el.appendChild(cursor);
+
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i < MESSAGE.length) {
+      cursor.before(document.createTextNode(MESSAGE[i++]));
+    } else {
+      clearInterval(timer);
+
+      /* cursor fades */
+      setTimeout(() => {
+        cursor.style.transition = 'opacity 0.5s';
+        cursor.style.opacity    = '0';
+      }, 1600);
+
+      /* corkboard fades in just below — no page scroll needed */
+      setTimeout(() => {
+        memSection.style.display = 'block';
+        setTimeout(() => {
+          memSection.classList.add('revealed');
+          /* gentle scroll so user sees the transition */
+          memSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }, 2200);
+    }
+  }, 65);
+}
+</script>
+</body>
+</html>
