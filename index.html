@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Journey ♥</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Orbitron:wght@400;600&family=Caveat:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -19,12 +19,10 @@ body {
 }
 
 /* Dynamic Aesthetic States */
-body[data-theme="month1"] {
-  background: #0d0205;
-}
-body[data-theme="month2"] {
-  background: radial-gradient(circle at 50% 30%, #071317 0%, #03090d 60%, #010305 100%);
-}
+body[data-theme="month1"] { background: #0d0205; }
+body[data-theme="month2"] { background: radial-gradient(circle at 50% 30%, #071317 0%, #03090d 60%, #010305 100%); }
+body[data-theme="month3"] { background: #1a0f12; }
+body[data-theme="archive"] { background: radial-gradient(circle at 50% 20%, #140a10 0%, #080406 70%); }
 
 #particles {
   position: fixed; top: 0; left: 0;
@@ -33,7 +31,7 @@ body[data-theme="month2"] {
 }
 
 /* ══════════════════════
-    LOCK SCREEN (SLOWED DOWN)
+    LOCK SCREEN
 ══════════════════════ */
 #lock-screen {
   position: fixed; inset: 0;
@@ -100,7 +98,7 @@ body[data-theme="month2"] {
   font-style: italic; font-size: 1.1rem;
   color: #a4ebd9; letter-spacing: 0.05em;
   text-align: center;
-  max-width: 320px;
+  max-width: 340px;
   line-height: 1.4;
   text-shadow: 0 0 6px rgba(0, 255, 204, 0.8), 0 0 20px rgba(0, 168, 150, 0.5);
 }
@@ -146,16 +144,31 @@ body[data-theme="month2"] {
 }
 #main-content.visible { display: flex; }
 
+.album-view {
+  display: none;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+.album-view.active-view {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Sub-nav used only inside the Archive (between Month 1 / Month 2) */
 .album-nav-bar {
   width: 100%;
   max-width: 1020px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  gap: 1rem;
   padding: 1.5rem clamp(1rem, 3vw, 2rem) 0;
   position: relative;
   z-index: 50;
   margin: 0 auto;
-  opacity: 0; 
+  opacity: 0;
   transition: opacity 1.5s ease;
 }
 .album-nav-bar.reveal-content { opacity: 1; }
@@ -191,17 +204,119 @@ body[data-theme="month2"] .nav-btn.active {
   border: 1px solid rgba(0, 255, 204, 0.2);
 }
 
-.album-view {
-  display: none;
-  width: 100%;
+/* ══════════════════════
+    MEMORY ARCHIVE BUTTON (Global)
+══════════════════════ */
+#archive-toggle {
+  position: fixed;
+  top: 1.4rem; right: 1.4rem;
+  z-index: 150;
+  display: flex; align-items: center; gap: 0.55rem;
+  background: rgba(20, 8, 12, 0.55);
+  border: 1px solid rgba(255, 200, 210, 0.25);
+  color: #f5e6e8;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  padding: 0.65rem 1.15rem;
+  border-radius: 30px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transition: all 0.35s ease, opacity 0.8s ease;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 1.2s ease, transform 1.2s ease;
 }
-.album-view.active-view {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
+#archive-toggle.reveal-content { opacity: 1; }
+#archive-toggle:hover {
+  border-color: rgba(255, 200, 210, 0.6);
+  background: rgba(40, 14, 20, 0.75);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+}
+#archive-toggle svg { width: 15px; height: 15px; opacity: 0.85; }
+
+#home-toggle {
+  position: fixed;
+  top: 1.4rem; left: 1.4rem;
+  z-index: 150;
+  display: none;
+  align-items: center; gap: 0.5rem;
+  background: rgba(20, 8, 12, 0.55);
+  border: 1px solid rgba(255, 200, 210, 0.25);
+  color: #f5e6e8;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  padding: 0.6rem 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+#home-toggle.show { display: flex; }
+#home-toggle:hover { border-color: rgba(255,200,210,0.6); background: rgba(40,14,20,0.75); }
+
+/* ══════════════════════
+    ARCHIVE MENU
+══════════════════════ */
+.archive-menu-wrap {
+  width: 100%;
+  max-width: 880px;
+  padding: clamp(5rem, 10vw, 7rem) 1.4rem 2rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.archive-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 18px rgba(255,120,150,0.4);
+}
+.archive-subtitle {
+  font-style: italic;
+  color: rgba(245,230,232,0.6);
+  margin-bottom: 3rem;
+  font-size: 1.05rem;
+}
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+}
+.archive-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 2.4rem 1.2rem;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  transition: all 0.45s cubic-bezier(0.25,1,0.5,1);
+  text-align: left;
+}
+.archive-card:hover { transform: translateY(-6px); border-color: rgba(255,200,210,0.35); box-shadow: 0 18px 40px rgba(0,0,0,0.5); }
+.archive-card .ac-month {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.2em;
+  color: rgba(255,200,210,0.55);
+  margin-bottom: 0.6rem;
+}
+.archive-card .ac-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+.archive-card .ac-desc {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: rgba(245,230,232,0.55);
+}
+.archive-card.m1-card { background: linear-gradient(135deg, rgba(139,26,42,0.18), rgba(20,5,8,0.4)); }
+.archive-card.m2-card { background: linear-gradient(135deg, rgba(0,168,150,0.12), rgba(5,15,18,0.5)); }
+
+@media (max-width: 600px) {
+  .archive-grid { grid-template-columns: 1fr; }
 }
 
 /* ══════════════════════
@@ -222,17 +337,11 @@ body[data-theme="month2"] .nav-btn.active {
   background: radial-gradient(ellipse, rgba(165,22,48,0.28) 0%, transparent 70%);
   pointer-events: none;
 }
-.rose-row {
-  font-size: clamp(1.4rem, 3.5vw, 2rem);
-  letter-spacing: 0.25em;
-  margin-bottom: 1.6rem;
-}
+.rose-row { font-size: clamp(1.4rem, 3.5vw, 2rem); letter-spacing: 0.25em; margin-bottom: 1.6rem; }
 .typing-text {
   font-family: 'Playfair Display', serif;
   font-size: clamp(1.5rem, 4vw, 2.7rem);
-  color: #ffffff;
-  line-height: 1.65;
-  letter-spacing: 0.04em;
+  color: #ffffff; line-height: 1.65; letter-spacing: 0.04em;
   max-width: min(700px, 90vw);
   text-shadow: 0 0 6px rgba(255,220,225,1), 0 0 12px rgba(255,120,150,1), 0 0 28px rgba(220,55, 85,1);
 }
@@ -276,181 +385,215 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
 /* ══════════════════════
     MONTH 2 CLOCKS DESIGN
 ══════════════════════ */
-.clocks-container {
-  width: 100%;
-  max-width: 1020px;
-  padding: 0 clamp(0.6rem, 3vw, 2rem);
-  margin: 1.5rem auto 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+.clocks-container { width: 100%; max-width: 1020px; padding: 0 clamp(0.6rem, 3vw, 2rem); margin: 1.5rem auto 0; display: flex; flex-direction: column; align-items: center; }
+.clocks-header { text-align: center; position: relative; padding: 3rem 1rem 1.5rem; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.clocks-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 4rem); font-weight: 600; color: #ffffff; letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(0, 255, 204, 0.4), 0 0 40px rgba(0, 168, 150, 0.2); line-height: 1.2; min-height: 1.2em; }
+.clocks-subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 2.5vw, 1.5rem); font-style: italic; color: #00ffa3; margin-top: 0.75rem; letter-spacing: 0.15em; opacity: 0; text-shadow: 0 0 10px rgba(0, 255, 204, 0.3); transition: opacity 1.5s ease; }
 
-.clocks-header {
-  text-align: center;
-  position: relative;
-  padding: 3rem 1rem 1.5rem;
-  min-height: 160px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.clocks-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 6vw, 4rem);
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  text-shadow: 0 0 20px rgba(0, 255, 204, 0.4), 0 0 40px rgba(0, 168, 150, 0.2);
-  line-height: 1.2;
-  min-height: 1.2em;
-}
-.clocks-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-  font-style: italic;
-  color: #00ffa3;
-  margin-top: 0.75rem;
-  letter-spacing: 0.15em;
-  opacity: 0; 
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-  transition: opacity 1.5s ease;
-}
+.fade-entrance-block { opacity: 0; transform: translateY(15px); transition: opacity 1.8s cubic-bezier(0.25, 1, 0.5, 1), transform 1.8s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+.fade-entrance-block.reveal-content { opacity: 1; transform: translateY(0); }
 
-/* Fade Animation Framework for Sequential Reveal */
-.fade-entrance-block {
-  opacity: 0;
-  transform: translateY(15px);
-  transition: opacity 1.8s cubic-bezier(0.25, 1, 0.5, 1), transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
-  width: 100%;
-}
-.fade-entrance-block.reveal-content {
-  opacity: 1;
-  transform: translateY(0);
-}
+.lyric-banner { width: 100%; text-align: center; padding: 2.5rem 1rem; margin: 2rem 0; border-top: 1px dashed rgba(0, 255, 204, 0.15); border-bottom: 1px dashed rgba(0, 255, 204, 0.15); background: linear-gradient(90deg, transparent, rgba(0, 168, 150, 0.03) 50%, transparent); }
+.lyric-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.2rem, 3.5vw, 1.9rem); color: #e2fdf7; letter-spacing: 0.05em; line-height: 1.5; animation: etherealPulse 4s ease-in-out infinite alternate; }
+@keyframes etherealPulse { 0% { text-shadow: 0 0 8px rgba(0,255,204,0.3); opacity: 0.8; } 100% { text-shadow: 0 0 20px rgba(0,255,204,0.6), 0 0 30px rgba(0,168,150,0.3); opacity: 1; } }
 
-.lyric-banner {
-  width: 100%;
-  text-align: center;
-  padding: 2.5rem 1rem;
-  margin: 2rem 0;
-  border-top: 1px dashed rgba(0, 255, 204, 0.15);
-  border-bottom: 1px dashed rgba(0, 255, 204, 0.15);
-  background: linear-gradient(90deg, transparent, rgba(0, 168, 150, 0.03) 50%, transparent);
-}
-.lyric-text {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: clamp(1.2rem, 3.5vw, 1.9rem);
-  color: #e2fdf7;
-  letter-spacing: 0.05em;
-  line-height: 1.5;
-  animation: etherealPulse 4s ease-in-out infinite alternate;
-}
-@keyframes etherealPulse {
-  0% { text-shadow: 0 0 8px rgba(0,255,204,0.3); opacity: 0.8; }
-  100% { text-shadow: 0 0 20px rgba(0,255,204,0.6), 0 0 30px rgba(0,168,150,0.3); opacity: 1; }
-}
-
-.time-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: clamp(0.75rem, 2.5vw, 1.75rem);
-  width: 100%;
-  justify-content: center;
-}
-
-.grid-card {
-  position: relative;
-  background: rgba(4, 14, 18, 0.5);
-  border: 1px solid rgba(0, 255, 204, 0.12);
-  border-radius: 12px;
-  padding: 10px 10px 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-  backdrop-filter: blur(4px);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  overflow: hidden;
-}
-.grid-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(0, 255, 204, 0.4);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0, 255, 204, 0.15);
-}
-
-.grid-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(180deg, rgba(0, 255, 204, 0.03) 0%, transparent 100%);
-  pointer-events: none;
-}
-
-.card-media-wrapper {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #03080a;
-  border: 1px solid rgba(0, 0, 0, 0.4);
-}
-.card-media-wrapper img, .card-media-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-}
+.time-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: clamp(0.75rem, 2.5vw, 1.75rem); width: 100%; justify-content: center; }
+.grid-card { position: relative; background: rgba(4, 14, 18, 0.5); border: 1px solid rgba(0, 255, 204, 0.12); border-radius: 12px; padding: 10px 10px 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); backdrop-filter: blur(4px); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); overflow: hidden; }
+.grid-card:hover { transform: translateY(-6px); border-color: rgba(0, 255, 204, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0, 255, 204, 0.15); }
+.grid-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0, 255, 204, 0.03) 0%, transparent 100%); pointer-events: none; }
+.card-media-wrapper { width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #03080a; border: 1px solid rgba(0, 0, 0, 0.4); }
+.card-media-wrapper img, .card-media-wrapper video { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .grid-card:hover .card-media-wrapper img { transform: scale(1.04); }
-
-.card-timestamp {
-  position: absolute;
-  bottom: 10px;
-  right: 12px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.68rem;
-  color: rgba(0, 255, 204, 0.4);
-  letter-spacing: 0.1em;
-}
-.card-caption {
-  position: absolute;
-  bottom: 8px;
-  left: 12px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 0.85rem;
-  font-style: italic;
-  color: rgba(245, 230, 232, 0.7);
-}
-
+.card-timestamp { position: absolute; bottom: 10px; right: 12px; font-family: 'Orbitron', sans-serif; font-size: 0.68rem; color: rgba(0, 255, 204, 0.4); letter-spacing: 0.1em; }
+.card-caption { position: absolute; bottom: 8px; left: 12px; font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-style: italic; color: rgba(245, 230, 232, 0.7); }
 .size-small { grid-column: span 3; }
 .size-medium { grid-column: span 4; }
 .size-large { grid-column: span 6; }
-
-.grid-card.type-video {
-  grid-column: span 6;
-  background: rgba(5, 20, 26, 0.7);
-  border-color: rgba(0, 255, 204, 0.2);
-}
+.grid-card.type-video { grid-column: span 6; background: rgba(5, 20, 26, 0.7); border-color: rgba(0, 255, 204, 0.2); }
 .grid-card.type-video .card-media-wrapper { aspect-ratio: 16/9; }
-
-.clocks-closing {
-  text-align: center;
-  padding: 6rem 1rem 3rem;
-}
-.clock-icon-divider {
-  font-size: 1.5rem;
-  color: rgba(0, 255, 204, 0.3);
-  margin-bottom: 1.5rem;
-  animation: clockSpin 20s linear infinite;
-  display: inline-block;
-}
+.clocks-closing { text-align: center; padding: 6rem 1rem 3rem; }
+.clock-icon-divider { font-size: 1.5rem; color: rgba(0, 255, 204, 0.3); margin-bottom: 1.5rem; animation: clockSpin 20s linear infinite; display: inline-block; }
 @keyframes clockSpin { to { transform: rotate(360deg); } }
+.closing-lyric-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); color: #ffffff; text-shadow: 0 0 15px rgba(0, 255, 204, 0.2); margin-bottom: 0.5rem; }
 
-.closing-lyric-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  color: #ffffff;
-  text-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-  margin-bottom: 0.5rem;
+/* ══════════════════════
+    MONTH 3: "10 THINGS I HATE ABOUT YOU"
+══════════════════════ */
+#view-month3 {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url('./images/image_1a0cf9.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: scroll;
+  isolation: isolate;
+}
+#view-month3::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15,5,8,0.55) 0%, rgba(15,5,8,0.25) 18%, rgba(10,4,6,0.35) 60%, rgba(8,3,5,0.85) 100%);
+  z-index: 0;
+}
+.m3-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(5rem, 10vw, 7.5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+}
+
+.m3-hero { text-align: center; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+.m3-kicker {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.m3-title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(3rem, 9vw, 6rem);
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  transform: rotate(-1.5deg);
+}
+.m3-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: rgba(255,255,255,0.8);
+  margin-top: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+/* Notebook-style quote notes scattered through the page */
+.m3-quote {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: clamp(1.6rem, 3.6vw, 2.3rem);
+  color: #fffaf2;
+  background: rgba(20,8,10,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(3px);
+  padding: 0.8rem 1.6rem;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.m3-quote.tape::before {
+  content: '';
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+  width: 60px; height: 18px;
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.m3-quote-row { text-align: center; margin: clamp(2rem, 5vw, 3.2rem) 0; position: relative; }
+.m3-quote-row.left { text-align: left; }
+.m3-quote-row.right { text-align: right; }
+.m3-quote-row.tilt-l .m3-quote { transform: rotate(-2.2deg); }
+.m3-quote-row.tilt-r .m3-quote { transform: rotate(1.8deg); }
+
+.m3-typewriter {
+  font-family: 'Special Elite', monospace;
+  font-size: clamp(1.1rem, 2.3vw, 1.4rem);
+  color: #f5e6e8;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  min-height: 2.4em;
+}
+.m3-typewriter .cursor { background: #fff; }
+
+/* "The list..." scene — media gallery */
+.m3-list-heading {
+  text-align: center;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+}
+.m3-list-heading .m3-quote { font-size: clamp(2rem, 5vw, 3rem); }
+
+.m3-gallery {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto auto;
+  gap: clamp(0.8rem, 2.5vw, 1.6rem);
+}
+.m3-frame {
+  position: relative;
+  background: #fdfaf3;
+  padding: 10px 10px 38px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.4s cubic-bezier(0.25,1,0.5,1);
+}
+.m3-frame:hover { transform: translateY(-6px) scale(1.02); z-index: 5; }
+.m3-frame .m3-pic {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg,#3a1f24,#23121a);
+}
+.m3-frame figcaption {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  color: #3a1f24;
+}
+.m3-frame.tape::after {
+  content: '';
+  position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+  width: 46px; height: 16px;
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.m3-frame.f1 { grid-column: 1 / 3; transform: rotate(-2deg); }
+.m3-frame.f2 { grid-column: 3 / 5; transform: rotate(1.5deg); }
+.m3-frame.f3 { grid-column: 5 / 7; transform: rotate(-1deg); }
+.m3-frame.f4 { grid-column: 1 / 3; transform: rotate(1.2deg); }
+.m3-frame.f5 { grid-column: 5 / 7; transform: rotate(-1.6deg); }
+
+.m3-video-frame {
+  grid-column: 3 / 5;
+  position: relative;
+  background: #0f0709;
+  border: 3px solid #5a2630;
+  padding: 8px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+  transform: rotate(-0.6deg);
+}
+.m3-video-frame video { width: 100%; aspect-ratio: 9/13; object-fit: cover; display: block; background: #1a0d10; }
+.m3-video-frame figcaption {
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: #ffd9e0;
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 760px) {
+  .m3-gallery { grid-template-columns: repeat(2, 1fr); }
+  .m3-frame.f1, .m3-frame.f2, .m3-frame.f3, .m3-frame.f4, .m3-frame.f5 { grid-column: auto; transform: none !important; }
+  .m3-video-frame { grid-column: 1 / 3; }
+}
+
+.m3-closing {
+  text-align: center;
+  margin-top: clamp(3rem, 8vw, 5rem);
+  padding-top: clamp(2rem, 5vw, 3rem);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+}
+.m3-closing .m3-quote { font-size: clamp(1.8rem, 4.5vw, 2.6rem); }
+.m3-closing p {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+  margin-top: 1rem;
 }
 
 /* ══════════════════════
@@ -468,9 +611,9 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
   .heart-svg             { width: 260px; height: 260px; }
   .lock-icon            { width: 66px;  height: 66px;  }
   .photos-row { grid-template-columns: repeat(2, 1fr); }
-  
   .size-small, .size-medium, .size-large { grid-column: span 6; }
   .clocks-container { padding: 0 0.75rem; }
+  .archive-card { padding: 1.8rem 1.2rem; }
 }
 
 @media (max-width: 420px) {
@@ -483,10 +626,11 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
 }
 </style>
 </head>
-<body data-theme="month2">
+<body data-theme="month3">
 
 <canvas id="particles"></canvas>
 
+<!-- ══════════ LOCK SCREEN ══════════ -->
 <div id="lock-screen">
 
   <div class="heart-lock-container" id="heartContainer">
@@ -531,145 +675,123 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
   </div>
 
   <div id="password-form">
-    <div class="hint-text">"I run but have no feet, i tick but cannot speak."</div>
+    <div class="hint-text">"The hottest and most amazing person from Elbasan(in the world por sdin gja Emi)."</div>
     <input type="password" id="pw-input" placeholder="enter the secret…" autocomplete="off" spellcheck="false"/>
     <div class="error-msg" id="error-msg">that's not quite right, love…</div>
   </div>
 
 </div>
 
+<!-- ══════════ GLOBAL NAV ══════════ -->
+<button id="archive-toggle" onclick="openArchiveMenu()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 7l2-4h14l2 4"/><path d="M9 11h6"/></svg>
+  Memory Archive
+</button>
+<button id="home-toggle" onclick="goHome()">
+  ← Month 3
+</button>
+
+<!-- ══════════ MAIN CONTENT ══════════ -->
 <div id="main-content">
 
-  <div class="album-nav-bar" id="topNavBar">
-    <div class="nav-container">
-      <button class="nav-btn" onclick="switchMonth('month1')">Month 1</button>
-      <button class="nav-btn active" onclick="switchMonth('month2')">Month 2</button>
-    </div>
-  </div>
+  <!-- MONTH 3 — DEFAULT LANDING -->
+  <div id="view-month3" class="album-view active-view">
+    <div class="m3-inner">
 
-  <div id="view-month2" class="album-view active-view">
-    <div class="clocks-container">
-      
-      <div class="clocks-header">
-        <h1 class="clocks-title" id="m2-typewriter-title"></h1>
-        <p class="clocks-subtitle" id="m2-subtitle">Month Two • Eternity In Beats</p>
+      <div class="m3-hero">
+        <div class="m3-kicker">Month Three</div>
+        <h1 class="m3-title">10 Things I Hate<br>About You</h1>
+        <p class="m3-sub">a list, written about a girl from Shkodra.</p>
       </div>
 
-      <div class="fade-entrance-block" id="m2-content-block">
-        
-        <div class="lyric-banner">
-          <p class="lyric-text">"Lights go out and I can't be saved<br>Tides that I tried to swim against..."</p>
-        </div>
+      <div class="m3-typewriter" id="m3-typewriter"></div>
 
-        <div class="time-grid">
-          
-          <div class="grid-card size-small">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi1.jpeg" alt="Memory Segment 1">
-            </div>
-            <div class="card-caption">Captured</div>
-            <div class="card-timestamp">00:01 // T</div>
-          </div>
+      <div class="m3-quote-row left tilt-l">
+        <span class="m3-quote tape">"I hate the way you talk to me."</span>
+      </div>
 
-          <div class="grid-card size-small">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi2.jpeg" alt="Memory Segment 2">
-            </div>
-            <div class="card-caption">Static Motion</div>
-            <div class="card-timestamp">00:02 // I</div>
-          </div>
+      <div class="m3-quote-row right tilt-r">
+        <span class="m3-quote tape">"I hate the way you're not around."</span>
+      </div>
 
-          <div class="grid-card size-medium">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi3.jpeg" alt="Memory Segment 3">
-            </div>
-            <div class="card-caption">Ethereal Days</div>
-            <div class="card-timestamp">00:03 // M</div>
-          </div>
+      <div class="m3-quote-row tilt-l">
+        <span class="m3-quote tape">"I hate it, I hate the way I don't hate you."</span>
+      </div>
 
-          <div class="grid-card size-medium">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi4.jpeg" alt="Memory Segment 4">
-            </div>
-            <div class="card-caption">Breathless</div>
-            <div class="card-timestamp">00:04 // E</div>
-          </div>
+      <div class="m3-list-heading">
+        <span class="m3-quote">The list...</span>
+      </div>
 
-          <div class="grid-card type-video">
-            <div class="card-media-wrapper">
-              <video src="./images/emimarsivid2.mp4" controls></video>
-            </div>
-            <div class="card-caption">Our Shared Frequency</div>
-            <div class="card-timestamp">LIVE // SYNCED</div>
-          </div>
+      <div class="m3-gallery">
+        <figure class="m3-frame f1 tape">
+          <img class="m3-pic" src="./images/emiMarsiFoto1.jpeg" alt="Memory 1">
+          <figcaption>one.</figcaption>
+        </figure>
+        <figure class="m3-frame f2 tape">
+          <img class="m3-pic" src="./images/emiMarsiFoto2.jpeg" alt="Memory 2">
+          <figcaption>two.</figcaption>
+        </figure>
+        <figure class="m3-frame f3 tape">
+          <img class="m3-pic" src="./images/emiMarsiFoto3.jpeg" alt="Memory 3">
+          <figcaption>three.</figcaption>
+        </figure>
 
-          <div class="grid-card size-medium">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi5.jpeg" alt="Memory Segment 5">
-            </div>
-            <div class="card-caption">Parallel Tracks</div>
-            <div class="card-timestamp">00:05 // N</div>
-          </div>
+        <figure class="m3-video-frame">
+          <video src="./images/emimarsivid3.mp4" controls></video>
+          <figcaption>this one's my favorite.</figcaption>
+        </figure>
 
-          <div class="grid-card size-small">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi6.jpeg" alt="Memory Segment 6">
-            </div>
-            <div class="card-caption">Glow</div>
-            <div class="card-timestamp">00:06 // O</div>
-          </div>
+        <figure class="m3-frame f4 tape">
+          <img class="m3-pic" src="./images/emiMarsiFoto4.jpeg" alt="Memory 4">
+          <figcaption>four.</figcaption>
+        </figure>
+        <figure class="m3-frame f5 tape">
+          <img class="m3-pic" src="./images/emiMarsiFoto5.jpeg" alt="Memory 5">
+          <figcaption>five.</figcaption>
+        </figure>
+        <figure class="m3-frame tape" style="grid-column: 3 / 5; transform: rotate(0.8deg);">
+          <img class="m3-pic" src="./images/emiMarsiFoto6.jpeg" alt="Memory 6">
+          <figcaption>six.</figcaption>
+        </figure>
+      </div>
 
-          <div class="grid-card size-small">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi7.jpeg" alt="Memory Segment 7">
-            </div>
-            <div class="card-caption">Closer Now</div>
-            <div class="card-timestamp">00:07 // W</div>
-          </div>
-
-          <div class="grid-card size-large">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi8.jpeg" alt="Memory Segment 8">
-            </div>
-            <div class="card-caption">Infinite Horizon</div>
-            <div class="card-timestamp">00:08 // LOOP</div>
-          </div>
-
-          <div class="grid-card size-medium">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi9.jpeg" alt="Memory Segment 9">
-            </div>
-            <div class="card-caption">Echoes</div>
-            <div class="card-timestamp">00:09 // REPEAT</div>
-          </div>
-
-          <div class="grid-card size-medium">
-            <div class="card-media-wrapper">
-              <img src="./images/foto_emimarsi10.jpeg" alt="Memory Segment 10">
-            </div>
-            <div class="card-caption">To the End</div>
-            <div class="card-timestamp">00:10 // INF</div>
-          </div>
-
-        </div>
-
-        <div class="lyric-banner">
-          <p class="lyric-text">"Home, home, where I wanted to go..."</p>
-        </div>
-
-        <div class="clocks-closing">
-          <div class="clock-icon-divider">⏳</div>
-          <h2 class="closing-lyric-title">You are...</h2>
-          <p class="clocks-subtitle" style="opacity: 1;">two months deeper into our always.</p>
-        </div>
-
+      <div class="m3-closing">
+        <span class="m3-quote">"I love you."</span>
+        <p>three months in, and the list only gets longer.</p>
       </div>
 
     </div>
   </div>
 
+  <!-- ARCHIVE MENU -->
+  <div id="view-archive" class="album-view">
+    <div class="archive-menu-wrap">
+      <div class="archive-title">Memory Archive</div>
+      <div class="archive-subtitle">every month we've lived, kept safe.</div>
+      <div class="archive-grid">
+        <div class="archive-card m1-card" onclick="switchMonth('month1')">
+          <div class="ac-month">Month 01</div>
+          <div class="ac-title">One Holy Month</div>
+          <div class="ac-desc">where it all began — roses, polaroids, and a promise.</div>
+        </div>
+        <div class="archive-card m2-card" onclick="switchMonth('month2')">
+          <div class="ac-month">Month 02</div>
+          <div class="ac-title">The Rhythm of Us</div>
+          <div class="ac-desc">a deeper beat — our shared frequency, captured in time.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTH 1 ARCHIVE -->
   <div id="view-month1" class="album-view">
-    
+    <div class="album-nav-bar reveal-content" id="m1-subnav">
+      <div class="nav-container">
+        <button class="nav-btn active" onclick="switchMonth('month1')">Month 1</button>
+        <button class="nav-btn" onclick="switchMonth('month2')">Month 2</button>
+      </div>
+    </div>
+
     <div id="message-header">
       <div class="rose-row">🌹 🌹 🌹 🌹 🌹 🌹 🌹</div>
       <div class="typing-text" id="typing-text"></div>
@@ -682,27 +804,19 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
         <div class="photos-row">
           <div class="photo-item" style="transform:rotate(-3.5deg);">
             <div class="pin gold"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi1.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi1.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(2.5deg);">
             <div class="pin red"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi2.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi2.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(-1.8deg);">
             <div class="pin silver"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi3.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi3.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(3.2deg);">
             <div class="pin cream"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi4.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi4.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
         </div>
 
@@ -716,43 +830,81 @@ body[data-theme="month2"] .cursor { background: #00ffa3; text-shadow: 0 0 8px #0
         <div class="photos-row">
           <div class="photo-item" style="transform:rotate(2.8deg);">
             <div class="pin red"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi5.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi5.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(-2.2deg);">
             <div class="pin gold"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi6.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi6.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(1.5deg);">
             <div class="pin cream"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi7.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi7.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
           <div class="photo-item" style="transform:rotate(-3deg);">
             <div class="pin silver"></div>
-            <div class="photo-frame">
-              <div class="photo-inner"><img src="./images/Foto emimarsi8.jpeg" style="width:100%;height:100%;object-fit:cover;"></div>
-            </div>
+            <div class="photo-frame"><div class="photo-inner"><img src="./images/Foto emimarsi8.jpeg" style="width:100%;height:100%;object-fit:cover;"></div></div>
           </div>
         </div>
 
-        <div class="closing">
-          one month down,<br>a lifetime to go.
+        <div class="closing">one month down,<br>a lifetime to go.</div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTH 2 ARCHIVE -->
+  <div id="view-month2" class="album-view">
+    <div class="album-nav-bar reveal-content" id="m2-subnav">
+      <div class="nav-container">
+        <button class="nav-btn" onclick="switchMonth('month1')">Month 1</button>
+        <button class="nav-btn active" onclick="switchMonth('month2')">Month 2</button>
+      </div>
+    </div>
+
+    <div class="clocks-container">
+      <div class="clocks-header">
+        <h1 class="clocks-title" id="m2-typewriter-title"></h1>
+        <p class="clocks-subtitle" id="m2-subtitle" style="opacity:0.85;">Month Two • Eternity In Beats</p>
+      </div>
+
+      <div class="fade-entrance-block reveal-content" id="m2-content-block">
+
+        <div class="lyric-banner">
+          <p class="lyric-text">"Lights go out and I can't be saved<br>Tides that I tried to swim against..."</p>
+        </div>
+
+        <div class="time-grid">
+          <div class="grid-card size-small"><div class="card-media-wrapper"><img src="./images/foto_emimarsi1.jpeg" alt="Memory Segment 1"></div><div class="card-caption">Captured</div><div class="card-timestamp">00:01 // T</div></div>
+          <div class="grid-card size-small"><div class="card-media-wrapper"><img src="./images/foto_emimarsi2.jpeg" alt="Memory Segment 2"></div><div class="card-caption">Static Motion</div><div class="card-timestamp">00:02 // I</div></div>
+          <div class="grid-card size-medium"><div class="card-media-wrapper"><img src="./images/foto_emimarsi3.jpeg" alt="Memory Segment 3"></div><div class="card-caption">Ethereal Days</div><div class="card-timestamp">00:03 // M</div></div>
+          <div class="grid-card size-medium"><div class="card-media-wrapper"><img src="./images/foto_emimarsi4.jpeg" alt="Memory Segment 4"></div><div class="card-caption">Breathless</div><div class="card-timestamp">00:04 // E</div></div>
+          <div class="grid-card type-video"><div class="card-media-wrapper"><video src="./images/emimarsivid2.mp4" controls></video></div><div class="card-caption">Our Shared Frequency</div><div class="card-timestamp">LIVE // SYNCED</div></div>
+          <div class="grid-card size-medium"><div class="card-media-wrapper"><img src="./images/foto_emimarsi5.jpeg" alt="Memory Segment 5"></div><div class="card-caption">Parallel Tracks</div><div class="card-timestamp">00:05 // N</div></div>
+          <div class="grid-card size-small"><div class="card-media-wrapper"><img src="./images/foto_emimarsi6.jpeg" alt="Memory Segment 6"></div><div class="card-caption">Glow</div><div class="card-timestamp">00:06 // O</div></div>
+          <div class="grid-card size-small"><div class="card-media-wrapper"><img src="./images/foto_emimarsi7.jpeg" alt="Memory Segment 7"></div><div class="card-caption">Closer Now</div><div class="card-timestamp">00:07 // W</div></div>
+          <div class="grid-card size-large"><div class="card-media-wrapper"><img src="./images/foto_emimarsi8.jpeg" alt="Memory Segment 8"></div><div class="card-caption">Infinite Horizon</div><div class="card-timestamp">00:08 // LOOP</div></div>
+          <div class="grid-card size-medium"><div class="card-media-wrapper"><img src="./images/foto_emimarsi9.jpeg" alt="Memory Segment 9"></div><div class="card-caption">Echoes</div><div class="card-timestamp">00:09 // REPEAT</div></div>
+          <div class="grid-card size-medium"><div class="card-media-wrapper"><img src="./images/foto_emimarsi10.jpeg" alt="Memory Segment 10"></div><div class="card-caption">To the End</div><div class="card-timestamp">00:10 // INF</div></div>
+        </div>
+
+        <div class="lyric-banner">
+          <p class="lyric-text">"Home, home, where I wanted to go..."</p>
+        </div>
+
+        <div class="clocks-closing">
+          <div class="clock-icon-divider">⏳</div>
+          <h2 class="closing-lyric-title">You are...</h2>
+          <p class="clocks-subtitle" style="opacity: 1;">two months deeper into our always.</p>
         </div>
 
       </div>
     </div>
-
   </div>
 
 </div>
 
 <script>
-/* ─── DYNAMIC COLDPLAY SPECTRUM PARTICLES ─── */
+/* ─── PARTICLES ─── */
 const canvas = document.getElementById('particles');
 const ctx    = canvas.getContext('2d');
 let W, H, particles = [];
@@ -763,7 +915,8 @@ window.addEventListener('resize', resize);
 
 const COLS_M1 = ['#8b1a2a','#c0394f','#6b0f1a','#d44060','#4e0818'];
 const COLS_M2 = ['#00ffa3', '#00a896', '#028090', '#f0f3f4', '#ffbc42', '#05668d'];
-let currentPalette = COLS_M2; 
+const COLS_M3 = ['#ffd9e0', '#ff8fa3', '#f5e6e8', '#c0394f', '#ffffff'];
+let currentPalette = COLS_M3;
 
 function Particle() { this.reset(true); }
 Particle.prototype.reset = function(init) {
@@ -802,7 +955,7 @@ for (let i = 0; i < 60; i++) particles.push(new Particle());
   requestAnimationFrame(loop);
 })();
 
-/* ─── PASSPORT AUTH REGISTRATION ─── */
+/* ─── PASSWORD AUTH ─── */
 const input       = document.getElementById('pw-input');
 const lockScreen  = document.getElementById('lock-screen');
 const heartCont   = document.getElementById('heartContainer');
@@ -815,8 +968,10 @@ const mainContent = document.getElementById('main-content');
 input.addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
 input.addEventListener('input',   () => errorMsg.classList.remove('show'));
 
+const SITE_PASSWORD = 'edmiri';
+
 function checkPw() {
-  if (input.value.trim().toLowerCase() === 'clocks') {
+  if (input.value.trim().toLowerCase() === SITE_PASSWORD) {
     unlock();
   } else {
     errorMsg.classList.add('show');
@@ -839,40 +994,67 @@ function unlock() {
     }, 250);
   }, 430);
 
-  // Cinematic slow scale expansion matching the css updates
   setTimeout(() => {
     heartCont.style.animation = 'none';
     void heartCont.offsetWidth;
     heartCont.classList.add('unlocking');
   }, 1300);
 
-  // Smooth extended fade of lock panel
   setTimeout(() => lockScreen.classList.add('fade-out'), 2600);
   setTimeout(() => {
     lockScreen.style.display = 'none';
     mainContent.classList.add('visible');
-    triggerMonth2IntroSequence();
+    enterMonth3(true);
+    document.getElementById('archive-toggle').classList.add('reveal-content');
   }, 4200);
 }
 
-/* ─── STATE ARCHITECT SWITCHING (M1 vs M2) ─── */
+/* ─── VIEW ROUTING ─── */
 let typewritingTriggeredM1 = false;
+let m2IntroTriggered = false;
+let m3TypewriterTriggered = false;
+
+function hideAllViews() {
+  document.querySelectorAll('.album-view').forEach(v => v.classList.remove('active-view'));
+}
+
+function enterMonth3(isFirstLoad) {
+  hideAllViews();
+  document.body.setAttribute('data-theme', 'month3');
+  currentPalette = COLS_M3;
+  document.getElementById('view-month3').classList.add('active-view');
+  document.getElementById('home-toggle').classList.remove('show');
+  particles.forEach(p => p.reset(true));
+
+  if (!m3TypewriterTriggered) {
+    m3TypewriterTriggered = true;
+    setTimeout(startTypingM3, isFirstLoad ? 500 : 100);
+  }
+}
+
+function openArchiveMenu() {
+  hideAllViews();
+  document.body.setAttribute('data-theme', 'archive');
+  currentPalette = COLS_M3;
+  document.getElementById('view-archive').classList.add('active-view');
+  document.getElementById('home-toggle').classList.add('show');
+  particles.forEach(p => p.reset(true));
+}
+
+function goHome() {
+  enterMonth3(false);
+}
 
 function switchMonth(targetMonth) {
-  const m1View = document.getElementById('view-month1');
-  const m2View = document.getElementById('view-month2');
-  const buttons = document.querySelectorAll('.nav-btn');
-  
-  m1View.classList.remove('active-view');
-  m2View.classList.remove('active-view');
-  buttons.forEach(btn => btn.classList.remove('active'));
-  
+  hideAllViews();
+  document.getElementById('home-toggle').classList.add('show');
+
   if (targetMonth === 'month1') {
     document.body.setAttribute('data-theme', 'month1');
     currentPalette = COLS_M1;
-    m1View.classList.add('active-view');
-    buttons[0].classList.add('active');
-    
+    document.getElementById('view-month1').classList.add('active-view');
+    syncSubnav('month1');
+
     if (!typewritingTriggeredM1) {
       typewritingTriggeredM1 = true;
       setTimeout(startTypingM1, 400);
@@ -880,32 +1062,61 @@ function switchMonth(targetMonth) {
   } else {
     document.body.setAttribute('data-theme', 'month2');
     currentPalette = COLS_M2;
-    m2View.classList.add('active-view');
-    buttons[1].classList.add('active');
+    document.getElementById('view-month2').classList.add('active-view');
+    syncSubnav('month2');
+
+    if (!m2IntroTriggered) {
+      m2IntroTriggered = true;
+      setTimeout(triggerMonth2IntroSequence, 300);
+    }
   }
-  
+
   particles.forEach(p => p.reset(true));
 }
 
-/* ─── MONTH 2 TYPEWRITER & SEQUENCE FADE-IN ─── */
-const M2_TITLE_TEXT = "The Rhythm of Us";
+function syncSubnav(active) {
+  document.querySelectorAll('#m1-subnav .nav-btn, #m2-subnav .nav-btn').forEach(btn => {
+    btn.classList.toggle('active',
+      (active === 'month1' && btn.textContent.trim() === 'Month 1') ||
+      (active === 'month2' && btn.textContent.trim() === 'Month 2')
+    );
+  });
+}
 
+/* ─── MONTH 3 TYPEWRITER ─── */
+const M3_INTRO_TEXT = "Dear Marsi, this list keeps growing longer every single day...";
+function startTypingM3() {
+  const el = document.getElementById('m3-typewriter');
+  if (!el || el.innerHTML !== '') return;
+
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  el.appendChild(cursor);
+
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i < M3_INTRO_TEXT.length) {
+      cursor.before(document.createTextNode(M3_INTRO_TEXT[i++]));
+    } else {
+      clearInterval(timer);
+      setTimeout(() => {
+        cursor.style.transition = 'opacity 0.5s';
+        cursor.style.opacity = '0';
+      }, 1600);
+    }
+  }, 55);
+}
+
+/* ─── MONTH 2 TYPEWRITER & FADE-IN ─── */
+const M2_TITLE_TEXT = "The Rhythm of Us";
 function triggerMonth2IntroSequence() {
-  document.body.setAttribute('data-theme', 'month2');
-  currentPalette = COLS_M2;
-  
   const titleEl = document.getElementById('m2-typewriter-title');
-  const subEl   = document.getElementById('m2-subtitle');
-  const navBar  = document.getElementById('topNavBar');
-  const content = document.getElementById('m2-content-block');
-  
-  titleEl.innerHTML = '';
-  subEl.style.opacity = '0';
-  
+  if (!titleEl || titleEl.innerHTML !== '') return;
+
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
   titleEl.appendChild(cursor);
-  
+
   let i = 0;
   const timer = setInterval(() => {
     if (i < M2_TITLE_TEXT.length) {
@@ -913,27 +1124,16 @@ function triggerMonth2IntroSequence() {
     } else {
       clearInterval(timer);
       setTimeout(() => { cursor.remove(); }, 1000);
-      
-      // Step 2: Fade subtitle elegantly
-      setTimeout(() => {
-        subEl.style.opacity = '0.85';
-      }, 300);
-      
-      // Step 3: Fade standard navigation panel and grid sections smoothly
-      setTimeout(() => {
-        navBar.classList.add('reveal-content');
-        content.classList.add('reveal-content');
-      }, 900);
     }
   }, 90);
 }
 
-/* ─── TYPING INTERFACE (M1 ARCHIVE) ─── */
+/* ─── MONTH 1 TYPEWRITER ─── */
 const MESSAGE_M1 = 'Thank you for being mine for one holy month';
 function startTypingM1() {
   const el = document.getElementById('typing-text');
-  if (!el || el.innerHTML !== '') return; 
-  
+  if (!el || el.innerHTML !== '') return;
+
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
   el.appendChild(cursor);
@@ -946,7 +1146,7 @@ function startTypingM1() {
       clearInterval(timer);
       setTimeout(() => {
         cursor.style.transition = 'opacity 0.5s';
-        cursor.style.opacity    = '0';
+        cursor.style.opacity = '0';
       }, 1600);
     }
   }, 65);
